@@ -1,5 +1,9 @@
+import * as companyRepository from '../repositories/companyRepository.js';
 
+async function verifyApiKey(key: string) {
+  const company = await companyRepository.findByApiKey(key);
 
-function verifyApiKey(apiKey: string): boolean {
-    return apiKey === '12345';
+  if (!company) throw new Error('Unauthorized');
+
+  return company;  
 }
