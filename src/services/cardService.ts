@@ -17,8 +17,10 @@ export async function createCard(employee: {id: number, fullName: string}, type:
   const card = cardFactory(employeeId, cardholderName, typeCard);
 
   await cardRepository.insert(card);
+  return card;
 }
 
+//TODO: Move to companyService
 export async function verifyApiKey(key: string) {
   if (!key) throw { type: 'NoKeyProvided'};
 
@@ -29,17 +31,29 @@ export async function verifyApiKey(key: string) {
   return company;
 }
 
-export async function cardIsValid(id: number){
+export async function cardIsValid(id: number, CVV: string) {
   const card = await cardRepository.findById(id);
 
   if(!card) throw { type: "CardNotFound"};
-  if(!checkValidDate(card.expirationDate)) throw { type: "CardExpired"};
   if(card.password) throw { type: "CardHasPassword"};
+  if(!checkValidDate(card.expirationDate)) throw { type: "CardExpired"};
+
+  const verifyCVV = cryptUtils.decryptSecurityCode(card.securityCode);
+  if(verifyCVV !== CVV) throw { type: "InvalidCVV"};
 
   return true;
 }
 
+export async function createPass(id: number, pass: string){
+  const card = await cardRepository.findById(id);
 
+  if(!card) throw { type: "CardNotFound"};
+  if(card.password) throw { type: "CardHasPassword"};
+
+  const password = cryptUtils.encryptPassword(pass);
+
+  await cardRepository.update(id, { password });
+}
 
 function generateValidDate(now: Date) {
   const month = now.getMonth() + 1;

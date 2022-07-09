@@ -17,6 +17,8 @@ cardRouter.post(
 ); 
 cardRouter.post(
   "/card/activate",validateSchema(schemas.cardPasswordSchema),
+  card.validCardActivation,
+  controller.setCardPass
   
   ); // activate a card
 cardRouter.get("/cards/:id"); // get cards of a user

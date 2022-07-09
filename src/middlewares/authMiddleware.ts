@@ -6,7 +6,7 @@ export function checkApiKey(req: Request, res: Response, next: NextFunction) {
   const key: string = req.header("x-api-key");
 
   const company = service.verifyApiKey(key);
-  if(!company) throw { message: "InvalidApiKey" };
+  if(!company) throw { type: "InvalidApiKey" };
 
   res.locals.company = company;
 

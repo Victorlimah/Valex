@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 
 import { TransactionTypes } from "../repositories/cardRepository.js";
 
+import * as cardService from "../services/cardService.js";
 import * as employeeService from "../services/employeeService.js";
 
 export async function validNewCard(req: Request, res: Response, next: NextFunction) {
@@ -15,4 +16,7 @@ export async function validNewCard(req: Request, res: Response, next: NextFuncti
   next();
 }
 
-export async function validCardPassword(){}
+export async function validCardActivation(req: Request, res: Response, next: NextFunction){
+  const { cardId, securityCode } : { cardId: number, securityCode: string } = req.body;
+  if(await cardService.cardIsValid(cardId, securityCode)) next();
+}

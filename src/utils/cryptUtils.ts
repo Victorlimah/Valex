@@ -1,4 +1,5 @@
 import Cryptr from "cryptr";
+import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -11,4 +12,13 @@ export function encryptSecurityCode(password: string) {
 
 export function decryptSecurityCode(encryptedSecurityCode: string) {
   return cryptr.decrypt(encryptedSecurityCode);
+}
+
+export function encryptPassword(password: string) {
+  const saltRounds = 10;
+  return bcrypt.hashSync(password, saltRounds);
+}
+
+export function decryptPassword(password: string, encryptedPassword: string) {
+  return bcrypt.compareSync(password, encryptedPassword);
 }
