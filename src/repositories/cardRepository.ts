@@ -51,6 +51,18 @@ export async function findByTypeAndEmployeeId(
   return result.rows[0];
 }
 
+export async function findByTypeAndEmployeeName(
+  type: string,
+  employeeName: string
+) {
+  const result = await connection.query<Card, [string, string]>(
+    `SELECT * FROM cards WHERE type=$1 AND "fullName"=$2`,
+    [type, employeeName]
+  );
+
+  return result.rows[0];
+}
+
 export async function findByCardDetails(
   number: string,
   cardholderName: string,
