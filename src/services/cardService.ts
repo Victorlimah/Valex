@@ -9,44 +9,25 @@ import * as employeeRepository from '../repositories/employeeRepository.js'
 
 import { TransactionTypes } from "../repositories/cardRepository.js";
 
-export async function createCard(key: string, employee: string, type: TransactionTypes) {
-  await verifyApiKey(key);
+export async function createCard(employee: {id: number, fullName: string}, type: TransactionTypes) {
+  const employeeId = employee.id;
+  const cardholderName = employeeUtils.formatName(employee.fullName);
+  const typeCard = type;
 
-  const cardholderName = employeeUtils.formatName(employee);
-  const employeeId = await employeeIsValid(cardholderName, type);
+  const card = cardFactory(employeeId, cardholderName, typeCard);
 
-  const expirationDate = generateValidDate(new Date());
-  const number = faker.finance.creditCardNumber(); 
-
-  const securityCode = faker.finance.creditCardCVV();
-  const securityCodeEncrypted = cryptUtils.encryptSecurityCode(securityCode); 
-
-  const card = cardFactory(employeeId, type, number, cardholderName, securityCodeEncrypted, expirationDate);
-
-  const result = await cardRepository.insert(card);
-
-  return result;
+  await cardRepository.insert(card);
 }
 
-
-async function verifyApiKey(key: string) {
+export async function verifyApiKey(key: string) {
   if (!key) throw new Error('NoKeyProvided');
 
   const company = await companyRepository.findByApiKey(key);
-  if (!company) throw new Error('InvalidKey');
-}
+  if (!company) throw { message: 'InvalidApiKey' };
 
-async function employeeIsValid(employee: string, type: TransactionTypes) {
-  const findEmployee = await employeeRepository.findByName(employee);
-  if (!findEmployee) throw new Error("InvalidEmployee");
+  delete company.apiKey;
 
-  const findCardTypeEmployee = await cardRepository.findByTypeAndEmployeeName(
-    type,
-    employee
-  );
-  if (findCardTypeEmployee) throw new Error("EmployeeAlreadyHasCard");
-
-  return findEmployee.id;
+  return company;
 }
 
 function generateValidDate(now: Date) {
@@ -55,14 +36,13 @@ function generateValidDate(now: Date) {
   return `${month}/${year}`;
 }
 
-function cardFactory(
-  employeeId: number,
-  type: TransactionTypes,
-  number: string,
-  cardholderName: string,
-  securityCode: string,
-  expirationDate: string
-) {
+function cardFactory(employeeId: number, cardholderName: string, type: TransactionTypes) {
+  const number = faker.finance.creditCardNumber();
+  const expirationDate = generateValidDate(new Date());
+
+  const generateCVV = faker.finance.creditCardCVV();
+  const securityCode = cryptUtils.encryptSecurityCode(generateCVV);
+
   const card = {
     employeeId,
     number,
