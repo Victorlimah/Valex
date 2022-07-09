@@ -1,20 +1,18 @@
 import pg from "pg";
 import dotenv from "dotenv";
-
 dotenv.config();
 
 const { Pool } = pg;
 
-const connectionsConfig:pg.Pool = new Pool({
-  connectionString:
-    process.env.DATABASE_URL || "postgres://localhost:5432/postgres",
-});
+const devConfig = { connectionString: process.env.DEV_DATABASE_URL };
+const prodConfig = { connectionString: process.env.DATABASE_URL, ssl: {} };
 
-// if (process.env.MODE === "PROD") {
-//   connectionsConfig.ssl = {
-//     rejectUnauthorized: false,
-//   };
-// }
+if (process.env.MODE === "PROD") {
+  prodConfig.ssl = {
+    rejectUnauthorized: false,
+  };
+}
 
-const connection = connectionsConfig;
-export default connection;
+const db = new Pool(process.env.MODE === "PROD" ? prodConfig : devConfig);
+
+export default db;

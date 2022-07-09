@@ -16,3 +16,12 @@ export async function findById(id: number) {
 
   return result.rows[0];
 }
+
+export async function findByName(name: string){
+    const result = await connection.query<Employee, [string]>(
+      "SELECT * FROM employees WHERE fullName=$1",
+      [name]
+    );
+
+    return result.rows[0];
+}
