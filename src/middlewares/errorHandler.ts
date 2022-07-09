@@ -1,6 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 
-export function errorHandler(err, req: Request, res: Response, next: NextFunction) {
-  console.log(err);
-  res.status(500).send("Something went wrong");
+export function errorHandler(err, _req: Request, res: Response, _next: NextFunction) {
+
+  const errors = {
+    "InvalidApiKey": 401,
+    "NoKeyProvided": 400,
+    "EmployeeNotFound": 401,
+    "EmployeeAlreadyHasCard": 409,
+  }                               
+  
+  const status = errors[err.message] || 500;
+  res.status(status).json({ message: err.message });
 }
