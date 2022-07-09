@@ -14,10 +14,11 @@ export async function createCard(employee: {id: number, fullName: string}, type:
   const cardholderName = employeeUtils.formatName(employee.fullName);
   const typeCard = type;
 
-  const card = cardFactory(employeeId, cardholderName, typeCard);
+  const CVV = faker.finance.creditCardCVV();
+  const card = cardFactory(employeeId, cardholderName, typeCard, CVV);
 
   await cardRepository.insert(card);
-  return card;
+  return {...card, securityCode: CVV};
 }
 
 //TODO: Move to companyService
@@ -73,11 +74,10 @@ function checkValidDate(date: string){
   return true;
 }
 
-function cardFactory(employeeId: number, cardholderName: string, type: TransactionTypes) {
+function cardFactory(employeeId: number, cardholderName: string, type: TransactionTypes, generateCVV: string) {
   const number = faker.finance.creditCardNumber();
   const expirationDate = generateValidDate(new Date());
 
-  const generateCVV = faker.finance.creditCardCVV();
   const securityCode = cryptUtils.encryptSecurityCode(generateCVV);
 
   const card = {
