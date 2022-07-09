@@ -3,7 +3,9 @@ import { Request, Response, NextFunction } from "express";
 
 export function validateSchema(schema: Joi.ObjectSchema) {
   return async (req: Request, res: Response, next: NextFunction) => {
-    await schema.validateAsync(req.body, { abortEarly: false });
+    const validation = await schema.validateAsync(req.body, { abortEarly: false });
+    if (validation.error) throw { type: "ValidationError", details: validation.error.details };
+
     next();
   };
 }

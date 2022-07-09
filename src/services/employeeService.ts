@@ -7,7 +7,7 @@ import * as employeeRepository from '../repositories/employeeRepository.js';
 export async function checkEmployeeExist(name: string){
 
   const employee = await employeeRepository.findByName(name);
-  if (!employee) throw { message: 'EmployeeNotFound' };
+  if (!employee) throw { type: "EmployeeNotFound" };
 
   return employee;
 } 
@@ -15,5 +15,5 @@ export async function checkEmployeeExist(name: string){
 export async function checkTypeCardExist(employeeId: number, type: TransactionTypes){
 
   const card = await cardRepository.findByTypeAndEmployeeId(type, employeeId);
-  if (card) throw { message: 'EmployeeAlreadyHasCard' };
+  if (card) throw { type: "EmployeeAlreadyHasCard" };
 }

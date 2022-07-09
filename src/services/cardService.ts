@@ -20,20 +20,43 @@ export async function createCard(employee: {id: number, fullName: string}, type:
 }
 
 export async function verifyApiKey(key: string) {
-  if (!key) throw new Error('NoKeyProvided');
+  if (!key) throw { type: 'NoKeyProvided'};
 
   const company = await companyRepository.findByApiKey(key);
-  if (!company) throw { message: 'InvalidApiKey' };
+  if (!company) throw { type: "InvalidApiKey" };
 
   delete company.apiKey;
-
   return company;
 }
+
+export async function cardIsValid(id: number){
+  const card = await cardRepository.findById(id);
+
+  if(!card) throw { type: "CardNotFound"};
+  if(!checkValidDate(card.expirationDate)) throw { type: "CardExpired"};
+  if(card.password) throw { type: "CardHasPassword"};
+
+  return true;
+}
+
+
 
 function generateValidDate(now: Date) {
   const month = now.getMonth() + 1;
   const year = now.getFullYear() + 5;
   return `${month}/${year}`;
+}
+
+function checkValidDate(date: string){
+  const now = new Date();
+  const [month, year] = date.split('/');
+  const cardMonth = parseInt(month);
+  const cardYear = parseInt(year);
+
+  if(cardYear < now.getFullYear()) return false;
+  if(cardMonth < now.getMonth() + 1) return false;
+
+  return true;
 }
 
 function cardFactory(employeeId: number, cardholderName: string, type: TransactionTypes) {

@@ -6,6 +6,10 @@ export async function createCard(req: Request, res: Response) {
   const { employee, type } = res.locals;
 
   await service.createCard(employee, type);
-
   res.status(201).send("Card created");
+}
+
+export async function setCardPass(req: Request, res: Response) {
+
+  res.status(200).send("Card password set");
 }

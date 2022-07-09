@@ -14,3 +14,5 @@ export async function validNewCard(req: Request, res: Response, next: NextFuncti
   res.locals.type = type;
   next();
 }
+
+export async function validCardPassword(){}
