@@ -52,10 +52,10 @@ export async function findByTypeAndEmployeeId(
 }
 
 export async function findByTypeAndEmployeeName(
-  type: string,
+  type: TransactionTypes,
   employeeName: string
 ) {
-  const result = await connection.query<Card, [string, string]>(
+  const result = await connection.query<Card, [TransactionTypes, string]>(
     `SELECT * FROM cards WHERE type=$1 AND "fullName"=$2`,
     [type, employeeName]
   );

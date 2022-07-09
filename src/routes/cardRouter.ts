@@ -1,8 +1,10 @@
 import { Router } from 'express';
 
+import * as controller from '../controllers/cardController.js';
+
 const cardRouter = Router();
 
-cardRouter.post('/card'); // create a new card
+cardRouter.post('/card', controller.createCard); // create a new card
 cardRouter.post('/card/activate'); // activate a card
 cardRouter.get('/cards/:id'); // get cards of a user
 cardRouter.get('/card/:id'); // get balance and transactions of a card

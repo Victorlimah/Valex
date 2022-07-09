@@ -19,7 +19,7 @@ export async function findById(id: number) {
 
 export async function findByName(name: string){
     const result = await connection.query<Employee, [string]>(
-      "SELECT * FROM employees WHERE fullName=$1",
+      `SELECT * FROM employees WHERE "fullName"=$1`,
       [name]
     );
 
