@@ -4,7 +4,6 @@ import * as cryptUtils from '../utils/cryptUtils.js';
 import * as employeeUtils from '../utils/employeeUtils.js'
 
 import * as cardRepository from '../repositories/cardRepository.js';
-import * as companyRepository from '../repositories/companyRepository.js';
 import * as paymentRepository from '../repositories/paymentRepository.js';
 import * as rechargeRepository from '../repositories/rechargeRepository.js';
 
@@ -20,17 +19,6 @@ export async function createCard(employee: {id: number, fullName: string}, type:
 
   await cardRepository.insert(card);
   return {...card, securityCode: CVV};
-}
-
-//TODO: Move to companyService
-export async function verifyApiKey(key: string) {
-  if (!key) throw { type: 'NoKeyProvided'};
-
-  const company = await companyRepository.findByApiKey(key);
-  if (!company) throw { type: "InvalidApiKey" };
-
-  delete company.apiKey;
-  return company;
 }
 
 export async function cardIsValid(id: number, CVV: string) {
