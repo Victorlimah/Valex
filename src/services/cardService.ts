@@ -5,7 +5,6 @@ import * as employeeUtils from '../utils/employeeUtils.js'
 
 import * as cardRepository from '../repositories/cardRepository.js';
 import * as companyRepository from '../repositories/companyRepository.js';
-import * as employeeRepository from '../repositories/employeeRepository.js'
 
 import { TransactionTypes } from "../repositories/cardRepository.js";
 
@@ -33,16 +32,35 @@ export async function verifyApiKey(key: string) {
 }
 
 export async function cardIsValid(id: number, CVV: string) {
-  const card = await cardRepository.findById(id);
+  const card = await getCard(id);
 
-  if(!card) throw { type: "CardNotFound"};
   if(card.password) throw { type: "CardHasPassword"};
-  if(!checkValidDate(card.expirationDate)) throw { type: "CardExpired"};
-
   const verifyCVV = cryptUtils.decryptSecurityCode(card.securityCode);
   if(verifyCVV !== CVV) throw { type: "InvalidCVV"};
 
   return true;
+}
+
+export async function blockCard(id: number){
+  const isBlocked = true;
+  await cardRepository.update(id, { isBlocked });
+}
+
+export async function cardIsBlocked(id:number, password: string) {
+  const card = await getCard(id);
+
+  if (!cryptUtils.decryptPassword(password, card.password))
+    throw { type: "IncorrectPassword" }; 
+
+  return card.isBlocked;
+}
+
+async function getCard(id: number){
+  const card = await cardRepository.findById(id);
+  if (!card) throw { type: "CardNotFound" };
+
+  if (!checkValidDate(card.expirationDate)) throw { type: "CardExpired" };
+  return card;
 }
 
 export async function createPass(id: number, pass: string){

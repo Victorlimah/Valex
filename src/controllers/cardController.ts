@@ -10,8 +10,15 @@ export async function createCard(req: Request, res: Response) {
 }
 
 export async function setCardPass(req: Request, res: Response) {
-  const { cardId, securityCode } = req.body;
+  const { cardId, password } = req.body;
 
-  await service.createPass(cardId, securityCode);
+  await service.createPass(cardId, password);
   res.status(200).send("Card password set");
+}
+
+export async function blockCard(req: Request, res: Response) {
+  const { cardId } = req.body;
+
+  await service.blockCard(cardId);
+  res.status(200).send("Card blocked");
 }

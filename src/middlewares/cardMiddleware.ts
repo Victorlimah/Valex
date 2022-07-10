@@ -20,3 +20,11 @@ export async function validCardActivation(req: Request, res: Response, next: Nex
   const { cardId, securityCode } : { cardId: number, securityCode: string } = req.body;
   if(await cardService.cardIsValid(cardId, securityCode)) next();
 }
+
+export async function validBlockCard(req: Request, res: Response, next: NextFunction){
+  const { cardId, password } : { cardId: number, password: string } = req.body;
+  if(await cardService.cardIsBlocked(cardId, password))
+    throw { type: "CardIsBlocked" };
+  
+  next();
+}

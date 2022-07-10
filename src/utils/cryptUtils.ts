@@ -15,8 +15,7 @@ export function decryptSecurityCode(encryptedSecurityCode: string) {
 }
 
 export function encryptPassword(password: string) {
-  const saltRounds = 10;
-  return bcrypt.hashSync(password, saltRounds);
+  return bcrypt.hashSync(password, 10);
 }
 
 export function decryptPassword(password: string, encryptedPassword: string) {
