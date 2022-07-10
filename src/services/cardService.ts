@@ -21,6 +21,13 @@ export async function createCard(employee: {id: number, fullName: string}, type:
   return {...card, securityCode: CVV};
 }
 
+export async function rechargeCard(cardId: number, amount: number) {
+  const card = await getCard(cardId);
+  if (!card.password) throw { type: "CardNotActive" };
+
+  await rechargeRepository.insert({ cardId, amount });
+}
+
 export async function cardIsValid(id: number, CVV: string) {
   const card = await getCard(id);
 
