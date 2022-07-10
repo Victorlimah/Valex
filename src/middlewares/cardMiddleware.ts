@@ -28,3 +28,12 @@ export async function validBlockCard(req: Request, res: Response, next: NextFunc
   
   next();
 }
+
+export async function validUnlockCard(req: Request, res: Response, next: NextFunction){
+  const { cardId, password } : { cardId: number, password: string } = req.body;
+  if(!await cardService.cardIsBlocked(cardId, password))
+    throw { type: "CardIsNotBlocked" };
+  
+  next();
+}
+

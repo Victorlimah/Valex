@@ -29,6 +29,11 @@ cardRouter.put("/card/block",
   card.validBlockCard,
   controller.blockCard
 );
-cardRouter.put("/card/unblock"); // unblock a card
+
+cardRouter.put("/card/unlock",
+  validateSchema(schemas.blockCardSchema),
+  card.validUnlockCard,
+  controller.unlockCard
+);
 
 export default cardRouter;

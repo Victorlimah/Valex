@@ -46,6 +46,11 @@ export async function blockCard(id: number){
   await cardRepository.update(id, { isBlocked });
 }
 
+export async function unlockCard(id: number) {
+  const isBlocked = false;
+  await cardRepository.update(id, { isBlocked });
+}
+
 export async function cardIsBlocked(id:number, password: string) {
   const card = await getCard(id);
 
