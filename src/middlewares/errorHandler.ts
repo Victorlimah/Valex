@@ -13,6 +13,9 @@ export function errorHandler(err, _req: Request, res: Response, _next: NextFunct
     "CardExpired": 401,
     "CardHasPassword": 401,
     "InvalidCVV": 401,
+    "InvalidPassword": 401,
+    "CardIsBlocked": 401,
+    "CardIsNotBlocked": 401,
   }                               
   
   const status = errors[err.type] || 500;
