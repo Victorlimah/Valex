@@ -29,3 +29,11 @@ export async function unlockCard(req: Request, res: Response){
   await service.unlockCard(cardId);
   res.status(200).send("Card unlocked");
 }
+
+export async function getExtract(req: Request, res: Response){
+  const { id } = req.params;
+  const cardId = Number(id);
+
+  const extract = await service.getExtract(cardId);
+  res.status(200).send(extract);
+}

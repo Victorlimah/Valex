@@ -5,6 +5,8 @@ import * as employeeUtils from '../utils/employeeUtils.js'
 
 import * as cardRepository from '../repositories/cardRepository.js';
 import * as companyRepository from '../repositories/companyRepository.js';
+import * as paymentRepository from '../repositories/paymentRepository.js';
+import * as rechargeRepository from '../repositories/rechargeRepository.js';
 
 import { TransactionTypes } from "../repositories/cardRepository.js";
 
@@ -58,6 +60,28 @@ export async function cardIsBlocked(id:number, password: string) {
     throw { type: "IncorrectPassword" }; 
 
   return card.isBlocked;
+}
+
+export async function getExtract(idCard: number){
+  const payments = await paymentRepository.findByCardId(idCard);
+  const recharges = await rechargeRepository.findByCardId(idCard);
+
+  const balance = await calculeBalance(payments, recharges);
+
+  return { balance, transactions: payments, recharges }
+}
+
+async function calculeBalance(payments: any[], recharges: any[]) {
+  let balance = 0;
+
+  for (const payment of payments) {
+    balance -= payment.amount;
+  }
+
+  for (const recharge of recharges) {
+    balance += recharge.amount;
+  }
+  return balance;
 }
 
 async function getCard(id: number){

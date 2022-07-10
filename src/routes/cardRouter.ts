@@ -22,8 +22,10 @@ cardRouter.post("/card/activate",
   controller.setCardPass
 ); 
 
-cardRouter.get("/cards/:id"); // get cards of a user || [REMOVED] 
-cardRouter.get("/cards/extract"
+cardRouter.get("/cards/:id"); // get cards of a user || [REMOVED]
+
+cardRouter.get("/card/:id/extract",
+  controller.getExtract
 
 ); // get balance and transactions of a card
 
