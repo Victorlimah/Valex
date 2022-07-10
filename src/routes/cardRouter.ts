@@ -22,8 +22,11 @@ cardRouter.post("/card/activate",
   controller.setCardPass
 ); 
 
-cardRouter.get("/cards/:id"); // get cards of a user
-cardRouter.get("/card/:id"); // get balance and transactions of a card
+cardRouter.get("/cards/:id"); // get cards of a user || [REMOVED] 
+cardRouter.get("/cards/extract"
+
+); // get balance and transactions of a card
+
 cardRouter.put("/card/block",
   validateSchema(schemas.blockCardSchema),
   card.validBlockCard,
