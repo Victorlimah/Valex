@@ -66,12 +66,11 @@ export async function newPurchase(cardId: number, password: string, businessId: 
   if(!card.password) throw { type: "CardInative" };
   if(card.password && !cryptUtils.decryptPassword(password, card.password)) throw { type: "IncorrectPassword" };
 
+  const extract = await getExtract(cardId);
+  if(extract.balance < amount) throw { type: "InsufficientBalance" };
+
   if(await businessIsValid(businessId, card.type))
     await paymentRepository.insert({ cardId, businessId, amount });
-
-  
-
-
 }
 
 async function businessIsValid(businessId: number, type: TransactionTypes) {
