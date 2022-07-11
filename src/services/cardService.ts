@@ -59,17 +59,32 @@ export async function cardIsBlocked(id:number, password: string) {
   return card.isBlocked;
 }
 
-export async function newPurchase(cardId: number, password: string, businessId: number, amount: number){
+export async function purchasePOS(cardId: number, password: string, businessId: number, amount: number){
   const card = await getCard(cardId);
 
-  if(card.isBlocked) throw { type: "CardIsBlocked" };
-  if(!card.password) throw { type: "CardInative" };
+  checkFitCard(card);
   if(card.password && !cryptUtils.decryptPassword(password, card.password)) throw { type: "IncorrectPassword" };
 
-  const extract = await getExtract(cardId);
-  if(extract.balance < amount) throw { type: "InsufficientBalance" };
+  await insertTransaction(cardId, businessId, amount, card.type);
+}
 
-  if(await businessIsValid(businessId, card.type))
+export async function purchaseOnline(number: string, holder: string, cvv: string, expiryDate: string, businessId: number, amount: number) {
+  const card = await cardRepository.findByCardDetails(number, holder, expiryDate);
+
+  if (!card) throw { type: "CardNotFound" };
+  if (!checkValidDate(card.expirationDate)) throw { type: "CardExpired" };
+  
+  checkFitCard(card); 
+  if (cryptUtils.decryptSecurityCode(cvv) !== card.securityCode) throw { type: "InvalidCVV" };
+
+  await insertTransaction(card.id, businessId, amount, card.type);
+}
+
+async function insertTransaction(cardId: number, businessId: number, amount: number, type: TransactionTypes) {
+  const extract = await getExtract(cardId);
+  if (extract.balance < amount) throw { type: "InsufficientBalance" };
+
+  if (await businessIsValid(businessId, type))
     await paymentRepository.insert({ cardId, businessId, amount });
 }
 
@@ -82,6 +97,10 @@ async function businessIsValid(businessId: number, type: TransactionTypes) {
   return true;
 }
 
+async function checkFitCard(card: any) {
+  if(card.isBlocked) throw { type: "CardIsBlocked" };
+  if(!card.password) throw { type: "CardInative" };
+}
 
 //TODO: Refatorar para enviar o timestamp formatado em DD/MM/YYYY
 export async function getExtract(idCard: number){
@@ -115,11 +134,9 @@ async function getCard(id: number){
 }
 
 export async function createPass(id: number, pass: string){
-  const card = await cardRepository.findById(id);
+  const card = await getCard(id);
 
-  if(!card) throw { type: "CardNotFound"};
   if(card.password) throw { type: "CardHasPassword"};
-
   const password = cryptUtils.encryptPassword(pass);
 
   await cardRepository.update(id, { password });
