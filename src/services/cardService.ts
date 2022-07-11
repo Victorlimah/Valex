@@ -6,6 +6,7 @@ import * as employeeUtils from '../utils/employeeUtils.js'
 import * as cardRepository from '../repositories/cardRepository.js';
 import * as paymentRepository from '../repositories/paymentRepository.js';
 import * as rechargeRepository from '../repositories/rechargeRepository.js';
+import * as businessRepository from '../repositories/businessRepository.js';
 
 import { TransactionTypes } from "../repositories/cardRepository.js";
 
@@ -38,6 +39,7 @@ export async function cardIsValid(id: number, CVV: string) {
   return true;
 }
 
+//TODO: Refatorar para receber uma string para saber se é para bloquear ou desbloquear
 export async function blockCard(id: number){
   const isBlocked = true;
   await cardRepository.update(id, { isBlocked });
@@ -46,7 +48,7 @@ export async function blockCard(id: number){
 export async function unlockCard(id: number) {
   const isBlocked = false;
   await cardRepository.update(id, { isBlocked });
-}
+} 
 
 export async function cardIsBlocked(id:number, password: string) {
   const card = await getCard(id);
@@ -57,6 +59,32 @@ export async function cardIsBlocked(id:number, password: string) {
   return card.isBlocked;
 }
 
+export async function newPurchase(cardId: number, password: string, businessId: number, amount: number){
+  const card = await getCard(cardId);
+
+  if(card.isBlocked) throw { type: "CardIsBlocked" };
+  if(!card.password) throw { type: "CardInative" };
+  if(card.password && !cryptUtils.decryptPassword(password, card.password)) throw { type: "IncorrectPassword" };
+
+  if(await businessIsValid(businessId, card.type))
+    await paymentRepository.insert({ cardId, businessId, amount });
+
+  
+
+
+}
+
+async function businessIsValid(businessId: number, type: TransactionTypes) {
+  const business = await businessRepository.findById(businessId);
+  
+  if (!business) throw { type: "BusinessNotFound" };
+  if (business.type !== type) throw { type: "BusinessTypeInvalid" };
+
+  return true;
+}
+
+
+//TODO: Refatorar para enviar o timestamp formatado em DD/MM/YYYY
 export async function getExtract(idCard: number){
   const payments = await paymentRepository.findByCardId(idCard);
   const recharges = await rechargeRepository.findByCardId(idCard);
