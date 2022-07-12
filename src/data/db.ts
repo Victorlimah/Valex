@@ -1,7 +1,7 @@
 import pg from "pg";
 import dotenv from "dotenv";
-dotenv.config();
 
+dotenv.config();
 const { Pool } = pg;
 
 const devConfig = { connectionString: process.env.DEV_DATABASE_URL };
@@ -13,6 +13,8 @@ if (process.env.MODE === "PROD") {
   };
 }
 
-const db = new Pool(process.env.MODE === "PROD" ? prodConfig : devConfig);
+const connection = new Pool(
+  process.env.MODE === "PROD" ? prodConfig : devConfig
+);
 
-export default db;
+export default connection;
