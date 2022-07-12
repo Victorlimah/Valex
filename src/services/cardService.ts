@@ -102,10 +102,12 @@ async function checkFitCard(card: any) {
   if(!card.password) throw { type: "CardInative" };
 }
 
-//TODO: Refatorar para enviar o timestamp formatado em DD/MM/YYYY
 export async function getExtract(idCard: number){
-  const payments = await paymentRepository.findByCardId(idCard);
-  const recharges = await rechargeRepository.findByCardId(idCard);
+  let payments = await paymentRepository.findByCardId(idCard);
+  let recharges = await rechargeRepository.findByCardId(idCard);
+
+  payments = refactPayments(payments);
+  recharges = refactRecharges(recharges);
 
   const balance = await calculeBalance(payments, recharges);
 
@@ -180,4 +182,18 @@ function cardFactory(employeeId: number, cardholderName: string, type: Transacti
   };
 
   return card;
+}
+
+function refactPayments(payments: any[]) {
+  return payments.map(payment => {
+    payment.timestamp = payment.timestamp.toLocaleDateString();
+    return payment;
+  });
+}
+
+function refactRecharges(recharges: any[]) {
+  return recharges.map(recharge => {
+    recharge.timestamp = recharge.timestamp.toLocaleDateString();
+    return recharge;
+  });
 }
