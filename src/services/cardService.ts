@@ -18,8 +18,8 @@ export async function createCard(employee: {id: number, fullName: string}, type:
   const CVV = faker.finance.creditCardCVV();
   const card = cardFactory(employeeId, cardholderName, typeCard, CVV);
 
-  await cardRepository.insert(card);
-  return {...card, securityCode: CVV};
+  const newCard = await cardRepository.insert(card);
+  return { ...newCard, securityCode: CVV };
 }
 
 export async function rechargeCard(cardId: number, amount: number) {
@@ -42,7 +42,11 @@ export async function cardIsValid(id: number, CVV: string) {
 //TODO: Refatorar para receber uma string para saber se é para bloquear ou desbloquear
 export async function blockCard(id: number){
   const isBlocked = true;
+  console.log("cheguei no service");
+
   await cardRepository.update(id, { isBlocked });
+  console.log("dei o update");
+
 }
 
 export async function unlockCard(id: number) {

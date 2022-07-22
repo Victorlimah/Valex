@@ -18,6 +18,7 @@ export async function setCardPass(req: Request, res: Response) {
 
 export async function blockCard(req: Request, res: Response) {
   const { cardId } = req.body;
+  console.log("Cheguei no controller");
 
   await service.blockCard(cardId);
   res.status(200).send("Card blocked");
